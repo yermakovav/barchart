@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title> Собачьи площадки в Москве </title>
+    <style>
+        h2 {
+            text-align: center;
+        }
+
+        #main-container {
+            background-image: url("https://playgroundprofessionals.com/sites/playgroundprofessionals.com/files/styles/mt_large/public/2020-09/dog-on-playground.jpg?itok=fn_1lkSI");
+        background-repeat: no-repeat;
+            background-size: auto;
+        }
+
+        #cells-table{
+            background-color: lavender;
+            opacity: 0.8;
+            height: 500px;
+            width: 200px;
+            margin-left: auto;
+            margin-right:auto;
+        }
+
+        #chart {
+            background-color: aliceblue;
+            opacity: 0.8;
+            height: 100px;
+        }
+
+        #chart-container {
+            width: 80%;
+            height: 100%;
+            margin: auto;
+            display: table;
+            padding: 10px;
+        }
+
+
+    </style>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.3.2/chart.min.js' integrity="sha512-VCHVc5miKoln972iJPvkQrUYYq7XpxXzvqNfiul1H4aZDwGBGC0lq373KNleaB2LpnC2a/iNfE5zoRYmB4TRDQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body>
+
+    <h2> В каком районе больше всего собачьих площадок? </h2>
+    <div id="main-container">
+        <canvas id='chart' width="200" height="500" style="border:0px; solid:#18a1cd;"> </canvas>
+
+        <table id="cells-table">
+            <thead>
+                <tr>
+                    <th>Район</th>
+                    <th>Количество площадок</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rayon in data %}
+                    <tr>
+                        <td>{{ rayon ['name'] }}</td>
+                        <td>{{ rayon ['count'] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</body>
+<script>
+    const ctx = document.getElementById('chart');
+
+    const config = getDataConfig ({{ data | tojson }});
+    const chart = new Chart (ctx, {
+    type: 'bar',
+    data: config,
+    options: {
+        indexAxis: 'y',
+    // Elements options apply to all of the options unless overridden in a dataset
+    // In this case, we are setting the border of each horizontal bar to be 2px wide
+        elements: {
+         bar: {
+            borderWidth: 1,
+        }
+        },
+        responsive: true,
+        plugins: {
+        legend: {
+            position: 'right',
+        },
+        title: {
+            display: true,
+            text: 'Количество собачьих площадок по районам Москвы'
+        }
+     }
+    },
+    });
+
+    function getDataConfig(data) {
+        let labels = [];
+        let dataRows = [];
+
+        for (let i=0; i<data.length; i++) {
+            const current = data [i];
+
+            if (current ['name'] && current ['count']) {
+               labels.push (current ['name']);
+               dataRows.push (current ["count"]);
+            }
+        };
+
+        const cfg = {
+            labels: labels,
+            datasets: [
+                {
+                    data: dataRows,
+                    label: 'Количество собачьих площадок',
+                }
+            ]
+        };
+
+        return cfg;
+    }
+
+</script>
+</html>
